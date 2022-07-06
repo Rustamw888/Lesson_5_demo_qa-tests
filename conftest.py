@@ -1,21 +1,13 @@
 import pytest
+from selene.support.shared import browser
 
 
-@pytest.fixture()
-def message():
-    return "this is message"
+@pytest.fixture(scope='function', autouse=True)
+def browser_management():
+    browser.config.base_url = 'https://demoqa.com'
+    browser.config.window_height = 1920
+    browser.config.window_width = 1080
 
+    yield
 
-@pytest.fixture()
-def firefox():
-    return " "
-
-
-@pytest.fixture()
-def chrome():
-    return " "
-
-
-@pytest.fixture()
-def chrome_mobile():
-    return " "
+    browser.quit()
