@@ -1,8 +1,6 @@
-import os.path
-
 from selene import have, command
 from selene.support.shared import browser
-from selene.support.shared.jquery_style import s, ss
+from selene.support.shared.jquery_style import s
 
 
 class student:
@@ -65,6 +63,23 @@ class Months:
     december = '11', 'December'
 
 
+def resource(path):
+    import Lesson_5_demoqa_tests
+    Lesson_5_demoqa_tests.__file__
+    from pathlib import Path
+    return str(
+        Path(Lesson_5_demoqa_tests.__file__)
+        .parent
+        .parent
+        .joinpath(f'resources/{path}')
+    )
+
+
+def cell_of_rows(index, should_have_texts: list[str]):
+    browser.element('.modal-dialog').all("table tr")[index].all('td').should(
+        have.exact_texts(*should_have_texts))
+
+
 def test_register_student():
     # Given
     browser.open('/automation-practice-form')
@@ -92,7 +107,8 @@ def test_register_student():
     s('#hobbiesWrapper').all('.custom-checkbox').element_by(have.exact_text(Hobbies.reading)).click()
     s('#hobbiesWrapper').all('.custom-checkbox').element_by(have.exact_text(Hobbies.music)).click()
 
-    s('#uploadPicture').send_keys(os.path.abspath("../resources/picture.png"))
+    s('#uploadPicture').send_keys(
+        resource('picture.png'))
 
     s('#currentAddress').type(student.current_address)
 
@@ -101,27 +117,6 @@ def test_register_student():
     s("#submit").perform(command.js.click)
 
     # Then
-    ss("table tr")[1].should(have.text(
-        f'{student.name} {student.surname}'))
-    ss("table tr")[2].should(have.text(student.email))
-    ss("table tr")[3].should(have.text(Gender.other))
-    ss("table tr")[4].should(have.text(student.mobile_number))
-    ss("table tr")[5].all('td')[1].should(have.text(
-        f'{student.birth_day} {Months.december[1]},{student.birth_year}'))
-    ss("table tr")[6].should(have.text(
-        f'{Subjects.computer_science}, {Subjects.english}'))
-    ss("table tr")[7].should(have.text(
-        f'{Hobbies.sports}, {Hobbies.reading}, {Hobbies.music}'))
-    ss("table tr")[8].should(have.text('picture.png'))
-    ss("table tr")[9].should(have.text(student.current_address))
-    ss("table tr")[10].should(have.text(
-        f'{State.ncr} {City.delhi}'))
-
-    # Then
-    def cell_of_rows(index, should_have_texts: list[str]):
-        browser.element('.modal-dialog').all("table tr")[index].all('td').should(
-            have.exact_texts(*should_have_texts))
-
     cell_of_rows(index=1, should_have_texts=[
         'Student Name',
         f'{student.name} {student.surname}'
